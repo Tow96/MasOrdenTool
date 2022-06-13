@@ -35,6 +35,52 @@ export default class DB {
     return response as Models.BackendUser[];
   };
 
+  /** userExists
+   * Returns a specific user if existent
+   *
+   * @returns {Models.BackendUser[]} The users from the DB
+   */
+  static userExists = async (username: string): Promise<Models.BackendUser> => {
+    const response = await userCollection.findOne({ username: username });
+
+    return response as Models.BackendUser;
+  };
+
+  /** addUser
+   * Adds a user to the DB
+   */
+  static addUser = async (user: Models.BackendUser): Promise<void> => {
+    await new userCollection({
+      clientId: user.clientId,
+      email: user.email,
+      name: user.name,
+      password: user.password,
+      username: user.username,
+    }).save();
+
+    return;
+  };
+
+  /** updateUser
+   * Edits a user
+   *
+   */
+  static updateUser = async (id: string, contents: Models.BackendUser): Promise<void> => {
+    await userCollection.findByIdAndUpdate(id, contents);
+
+    return;
+  };
+
+  /** deleteUser
+   * Removes a user using the username
+   *
+   */
+  static deleteUser = async (username: string): Promise<void> => {
+    await userCollection.findOneAndDelete({ username: username });
+
+    return;
+  };
+
   /** getIds
    * Returns a list with all the ids that have already been fetched
    *

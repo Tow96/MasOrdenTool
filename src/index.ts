@@ -90,7 +90,69 @@ class MasOrdenTool {
     // Routes, theres only a couple of routes for this service, there is no need to create a separate file for them
     app.post('/run', (__, res) => {
       MasOrdenTool.requestFiles();
-      res.sendStatus(204);
+      res.sendStatus(200);
+    });
+
+    // Add user
+    app.post('/users', async (req, res) => {
+      const nuUser = req.body as Models.BackendUser;
+
+      const userExists = await DB.userExists(nuUser.username);
+      if (userExists !== null) return res.status(422).send({ error: 'User already registered' });
+
+      await DB.addUser(nuUser);
+
+      res.sendStatus(200);
+    });
+
+    // Edit user
+    app.patch('/users', async (req, res) => {
+      const editedUser = req.body as Models.BackendUser;
+
+      const userExists = await DB.userExists(editedUser.username);
+      if (userExists === null) return res.status(422).send({ error: `User doesn't exist` });
+
+      const contents = {} as Models.BackendUser;
+
+      if (editedUser.clientId) {
+        if (editedUser.clientId !== userExists.clientId) {
+          contents.clientId = editedUser.clientId;
+        }
+      }
+
+      if (editedUser.email) {
+        if (editedUser.email !== userExists.email) {
+          contents.email = editedUser.email;
+        }
+      }
+
+      if (editedUser.name) {
+        if (editedUser.name !== userExists.name) {
+          contents.name = editedUser.name;
+        }
+      }
+
+      if (editedUser.password) {
+        if (editedUser.password !== userExists.password) {
+          contents.password = editedUser.password;
+        }
+      }
+
+      if (Object.keys(contents).length < 1) {
+        return res.sendStatus(204);
+      }
+
+      await DB.updateUser(userExists._id, contents);
+
+      res.sendStatus(200);
+    });
+
+    // Delete user
+    app.delete('/users', async (req, res) => {
+      const deletedUser = req.body as Models.BackendUser;
+
+      await DB.deleteUser(deletedUser.username);
+      res.sendStatus(200);
     });
 
     // Starts the server
@@ -132,6 +194,7 @@ class MasOrdenTool {
         );
       } catch (e: any) {
         logger.error(e);
+        continue;
       }
 
       // Fetches all the receipts
@@ -152,6 +215,10 @@ class MasOrdenTool {
           receiptData = receiptRes.data;
 
           // Creates the temporary directory
+          if (!fs.existsSync(`./temp/`)) {
+            fs.mkdirSync(`./temp/`);
+          }
+
           if (!fs.existsSync(`./temp/${userId['custom:guid']}`)) {
             fs.mkdirSync(`./temp/${userId['custom:guid']}`);
           }
@@ -160,7 +227,10 @@ class MasOrdenTool {
             // Fetches only if the receipts haven't been already fetched
             if (receiptIds.ids.indexOf(receipt.FacturaUUID) == -1) {
               logger.info(`---- Fetching file for ${receipt.FacturaUUID}`);
-              // TODO: Refresh accessToken
+
+              // Refreshes the token
+              const refresh = await http.refresh(user.clientId, auth.AuthenticationResult.RefreshToken);
+              auth = refresh.data;
 
               // Creates the temporary directory for the receipt
               if (!fs.existsSync(`./temp/${userId['custom:guid']}/${receipt.FacturaUUID}`)) {
@@ -206,7 +276,7 @@ class MasOrdenTool {
       if (fetchedList.length === 0) {
         logger.info('-- No new receipts to fecth');
         logger.debug('-- Done');
-        return;
+        continue;
       }
 
       // Zips the files

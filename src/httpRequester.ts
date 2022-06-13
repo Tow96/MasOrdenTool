@@ -31,6 +31,24 @@ export default class HttpRequester {
     return res;
   }
 
+  async refresh(clientid: string, token: string): Promise<AxiosResponse<Models.LoginResponse>> {
+    const payload = {
+      AuthFlow: 'REFRESH_TOKEN_AUTH',
+      ClientId: clientid,
+      AuthParameters: {
+        DEVICE_KEY: null,
+        REFRESH_TOKEN: token,
+      },
+    };
+
+    const res = await this.axios.post('https://cognito-idp.us-west-2.amazonaws.com', payload, {
+      headers: { ...this.headers, 'x-amz-target': 'AWSCognitoIdentityProviderService.InitiateAuth' },
+    });
+
+    res.data.AuthenticationResult.RefreshToken = token;
+    return res;
+  }
+
   async logout(token: string): Promise<AxiosResponse<null>> {
     const payload = {
       AccessToken: token,
