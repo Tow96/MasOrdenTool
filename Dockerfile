@@ -21,4 +21,4 @@ FROM base as prod
 RUN npm ci --production
 
 COPY --from=builder /usr/app/dist ./dist
-CMD node dist/index.js
+CMD npm run start

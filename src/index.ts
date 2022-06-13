@@ -302,6 +302,8 @@ class MasOrdenTool {
 
       if (fetchedList.length === 0) {
         logger.info('-- No new receipts to fecth');
+        logger.info('-- Cleaning temp folder');
+        fs.rmSync(`./temp/${userId['custom:guid']}`, { recursive: true, force: true });
         logger.debug('-- Done');
         continue;
       }
