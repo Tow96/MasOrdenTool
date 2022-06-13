@@ -16,6 +16,7 @@ const nodeMailer = require('nodemailer'); // eslint-disable-line @typescript-esl
 import * as fs from 'fs';
 import { google } from 'googleapis';
 import AdmZip from 'adm-zip';
+import cron from 'node-cron';
 import express from 'express';
 import jwt_decode from 'jwt-decode';
 import logger from 'tow96-logger';
@@ -28,19 +29,24 @@ import DB from './database';
 import * as Models from './models';
 import HttpRequester from './httpRequester';
 
-// TODO: Create cronjob
-
 // Main Class
 class MasOrdenTool {
   // Gets the variables from the .env
   private static port = process.env.PORT || 3000;
   private static corsOrigin = process.env.CORS_ORIGIN;
   private static databaseUrl = process.env.DATABASE_URL || '';
+  private static cronOnStart = process.env.SCHEDULE_ONSTART || false;
 
   private static connectToDB = (): void => {
     mongoose
       .connect(MasOrdenTool.databaseUrl)
-      .then(() => logger.info('Connected to database'))
+      .then(() => {
+        logger.info('Connected to database');
+        if (MasOrdenTool.cronOnStart === true) {
+          MasOrdenTool.schedule.start();
+          logger.info('Started schedule');
+        }
+      })
       .catch((err) => {
         if (MasOrdenTool.databaseUrl !== '') {
           logger.error(`${err}`);
@@ -101,6 +107,7 @@ class MasOrdenTool {
       if (userExists !== null) return res.status(422).send({ error: 'User already registered' });
 
       await DB.addUser(nuUser);
+      logger.info(`Added user ${nuUser.username}`);
 
       res.sendStatus(200);
     });
@@ -143,6 +150,7 @@ class MasOrdenTool {
       }
 
       await DB.updateUser(userExists._id, contents);
+      logger.info(`Edited user ${editedUser.username}`);
 
       res.sendStatus(200);
     });
@@ -152,6 +160,21 @@ class MasOrdenTool {
       const deletedUser = req.body as Models.BackendUser;
 
       await DB.deleteUser(deletedUser.username);
+      logger.info(`Deleted user ${deletedUser.username}`);
+
+      res.sendStatus(200);
+    });
+
+    // Start timer
+    app.get('/timer/start', (__, res) => {
+      logger.info('Started schedule');
+      MasOrdenTool.schedule.start();
+      res.sendStatus(200);
+    });
+
+    app.get('/timer/stop', (__, res) => {
+      logger.info('Stopped schedule');
+      MasOrdenTool.schedule.stop();
       res.sendStatus(200);
     });
 
@@ -396,6 +419,11 @@ class MasOrdenTool {
       logger.error(e);
     }
   };
+
+  // Automatically runs the job every day at 03:00
+  private static schedule = cron.schedule('0 3 * * *', MasOrdenTool.requestFiles, {
+    scheduled: false,
+  });
 }
 
 MasOrdenTool.startServer().catch((err: any) => {
