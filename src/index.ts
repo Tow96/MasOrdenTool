@@ -23,11 +23,13 @@ import logger from 'tow96-logger';
 import mailgen from 'mailgen';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
 
 // Other files
 import DB from './database';
 import * as Models from './models';
 import HttpRequester from './httpRequester';
+import swaggerDoc from './swagger';
 
 // Main Class
 class MasOrdenTool {
@@ -94,6 +96,8 @@ class MasOrdenTool {
     }
 
     // Routes, theres only a couple of routes for this service, there is no need to create a separate file for them
+    app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+
     app.post('/run', (__, res) => {
       MasOrdenTool.requestFiles();
       res.sendStatus(200);
