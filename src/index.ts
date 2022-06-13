@@ -125,12 +125,6 @@ class MasOrdenTool {
 
       const contents = {} as Models.BackendUser;
 
-      if (editedUser.clientId) {
-        if (editedUser.clientId !== userExists.clientId) {
-          contents.clientId = editedUser.clientId;
-        }
-      }
-
       if (editedUser.email) {
         if (editedUser.email !== userExists.email) {
           contents.email = editedUser.email;
@@ -256,7 +250,7 @@ class MasOrdenTool {
               logger.info(`---- Fetching file for ${receipt.FacturaUUID}`);
 
               // Refreshes the token
-              const refresh = await http.refresh(user.clientId, auth.AuthenticationResult.RefreshToken);
+              const refresh = await http.refresh(auth.AuthenticationResult.RefreshToken);
               auth = refresh.data;
 
               // Creates the temporary directory for the receipt

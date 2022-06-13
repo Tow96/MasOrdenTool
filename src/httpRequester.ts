@@ -4,6 +4,7 @@ import * as Models from './models';
 export default class HttpRequester {
   private axios: AxiosInstance;
   private headers: any;
+  private poolId = process.env.POOL_ID || '2nrooo12hidnh7m6ilo5ftsdqa';
 
   constructor() {
     this.axios = axios.create();
@@ -18,7 +19,7 @@ export default class HttpRequester {
   async login(user: Models.BackendUser): Promise<AxiosResponse<Models.LoginResponse>> {
     const payload = {
       AuthFlow: 'USER_PASSWORD_AUTH',
-      ClientId: user.clientId,
+      ClientId: this.poolId,
       AuthParameters: {
         USERNAME: user.username,
         PASSWORD: user.password,
@@ -31,10 +32,10 @@ export default class HttpRequester {
     return res;
   }
 
-  async refresh(clientid: string, token: string): Promise<AxiosResponse<Models.LoginResponse>> {
+  async refresh(token: string): Promise<AxiosResponse<Models.LoginResponse>> {
     const payload = {
       AuthFlow: 'REFRESH_TOKEN_AUTH',
-      ClientId: clientid,
+      ClientId: this.poolId,
       AuthParameters: {
         DEVICE_KEY: null,
         REFRESH_TOKEN: token,

@@ -14,7 +14,6 @@ export interface User {
   name: string;
   username: string;
   email: string;
-  clientId: string;
 }
 
 export interface BackendUser extends User {

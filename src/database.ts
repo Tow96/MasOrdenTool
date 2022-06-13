@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema({
   username: String,
   email: String,
   password: String,
-  clientId: String,
 });
 
 const idSchema = new mongoose.Schema({
@@ -51,7 +50,6 @@ export default class DB {
    */
   static addUser = async (user: Models.BackendUser): Promise<void> => {
     await new userCollection({
-      clientId: user.clientId,
       email: user.email,
       name: user.name,
       password: user.password,
