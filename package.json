@@ -1,6 +1,6 @@
 {
   "name": "masordentool",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Tool used to download data from the Mas Orden webpage",
   "main": "src/index.ts",
   "scripts": {
