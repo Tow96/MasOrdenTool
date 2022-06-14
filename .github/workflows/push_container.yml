@@ -42,5 +42,3 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           target: 'prod'
           file: ./Dockerfile
-          build-args: |
-            REACT_APP_WEBAPI=${{ secrets.API_URL }}
