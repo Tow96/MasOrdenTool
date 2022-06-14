@@ -17,7 +17,7 @@ jobs:
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
         with:
-          images: ghcr.io/towech-financeApp/CateogryReportService
+          images: ghcr.io/tow96/MasOrdenTool
           tag-sha: true
           tag-edge: false
           tag-latest: true
