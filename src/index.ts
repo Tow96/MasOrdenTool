@@ -37,7 +37,7 @@ class MasOrdenTool {
   private static port = process.env.PORT || 3000;
   private static corsOrigin = process.env.CORS_ORIGIN;
   private static databaseUrl = process.env.DATABASE_URL || '';
-  private static cronOnStart = process.env.SCHEDULE_ONSTART || false;
+  private static cronOnStart = (process.env.SINGLE_LOGS || 'false').toLowerCase() === 'true';
 
   private static connectToDB = (): void => {
     mongoose
