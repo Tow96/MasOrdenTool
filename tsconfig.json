@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "module": "commonjs",                           
+    "outDir": "./dist",                              
+    "strict": true,                                 
+    "esModuleInterop": true,                        
+    "skipLibCheck": true,                           
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": ["./src/@types"]
+  }
+}
