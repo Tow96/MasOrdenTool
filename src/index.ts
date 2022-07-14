@@ -325,6 +325,7 @@ class MasOrdenTool {
       logger.info('-- Sending mail');
       await MasOrdenTool.sendMail(
         user.email,
+        user.name,
         `./temp/${userId['custom:guid']}/zips`,
         fs.readdirSync(`./temp/${userId['custom:guid']}/zips`),
       );
@@ -339,9 +340,7 @@ class MasOrdenTool {
     }
   };
 
-  static sendMail = async (recipient: string, root: string, files: string[]): Promise<void> => {
-    const name = 'Tow';
-
+  static sendMail = async (recipient: string, name: string, root: string, files: string[]): Promise<void> => {
     try {
       const { EMAIL, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN } = process.env;
       const OAuth2 = google.auth.OAuth2;
