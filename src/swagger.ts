@@ -1,6 +1,5 @@
 import packageData from '../package.json';
 
-
 const swaggerDoc = {
   swagger: '2.0',
   info: {
