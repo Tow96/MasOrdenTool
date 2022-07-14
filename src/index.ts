@@ -38,6 +38,8 @@ class MasOrdenTool {
   private static corsOrigin = process.env.CORS_ORIGIN;
   private static databaseUrl = process.env.DATABASE_URL || '';
   private static cronOnStart = (process.env.SINGLE_LOGS || 'false').toLowerCase() === 'true';
+  private static customCron = process.env.CUSTOMCRON || '';
+  private static defaultCron = '0 3 * * *';
 
   private static connectToDB = (): void => {
     mongoose
@@ -62,6 +64,12 @@ class MasOrdenTool {
 
   static startServer = async () => {
     MasOrdenTool.connectToDB();
+
+    if (!cron.validate(this.customCron)) {
+      logger.warn(`No valid custom cron schedule was provided, using default: ${this.defaultCron}`);
+    } else {
+      logger.info(`Using custom cron schedule: ${this.customCron}`);
+    }
 
     // Sets up the server
     const app = express();
@@ -325,6 +333,7 @@ class MasOrdenTool {
       logger.info('-- Sending mail');
       await MasOrdenTool.sendMail(
         user.email,
+        user.name,
         `./temp/${userId['custom:guid']}/zips`,
         fs.readdirSync(`./temp/${userId['custom:guid']}/zips`),
       );
@@ -339,9 +348,7 @@ class MasOrdenTool {
     }
   };
 
-  static sendMail = async (recipient: string, root: string, files: string[]): Promise<void> => {
-    const name = 'Tow';
-
+  static sendMail = async (recipient: string, name: string, root: string, files: string[]): Promise<void> => {
     try {
       const { EMAIL, EMAIL_CLIENT_ID, EMAIL_CLIENT_SECRET, EMAIL_REFRESH_TOKEN } = process.env;
       const OAuth2 = google.auth.OAuth2;
@@ -421,9 +428,13 @@ class MasOrdenTool {
   };
 
   // Automatically runs the job every day at 03:00
-  private static schedule = cron.schedule('0 3 * * *', MasOrdenTool.requestFiles, {
-    scheduled: false,
-  });
+  private static schedule = cron.schedule(
+    cron.validate(this.customCron) ? this.customCron : this.defaultCron,
+    MasOrdenTool.requestFiles,
+    {
+      scheduled: false,
+    },
+  );
 }
 
 MasOrdenTool.startServer().catch((err: any) => {
