@@ -3,8 +3,6 @@ name: Create container, push and deploy
 on:
   release:
     types: [published]
-  push:
-    branches: [development] #remove after
 
 jobs:
   build:
