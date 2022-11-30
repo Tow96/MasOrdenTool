@@ -3,6 +3,8 @@ name: Create container, push and deploy
 on:
   release:
     types: [published]
+  push:
+    branches: [development] #remove after
 
 jobs:
   build:
@@ -22,7 +24,7 @@ jobs:
         id: qemu
         uses: docker/setup-qemu-action@v1.0.1
         with:
-          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm/v8
+          platforms: linux/amd64,linux/arm/v8
 
       - name: Set up Docker Buildx
         id: buildx
@@ -40,7 +42,7 @@ jobs:
         with:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
-          platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm/v8
+          platforms: linux/amd64,linux/arm/v8
           target: 'prod'
           file: ./Dockerfile
 
