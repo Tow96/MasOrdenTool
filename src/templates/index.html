@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@1.9.5" integrity="sha384-xcuj3WpfgjlKF+FXhSQFQ0ZNr39ln+hwjN3npfM9VBnUskLolQAcN80McRIVOPuO" crossorigin="anonymous"></script>
+    <title>Mas Orden Tool</title>
+  </head>
+  <body>
+    <h1>Mas Orden Tool</h1>
+
+    <button hx-post="/run" hx-swap="none">Make run</button>
+
+    <h3>Add Account</h3>
+    <form hx-post="/account" hx-target="#acc-list" hx-swap="beforeend">
+      <label for="acc-name">Name</label>
+      <input type="text" name="name" id="acc-name" />
+
+      <label for="acc-user">Username</label>
+      <input type="text" name="user" id="acc-user" />
+
+      <label for="acc-pass">Password</label>
+      <input type="password" name="pass" id="acc-pass" />
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <h3>Accounts</h3>
+    <ul id="acc-list">
+      {{ range . }}
+        {{ block "account-list-element" .}}
+          <p>{{ .Name }} - {{ .User }} </p>
+        {{ end }}
+      {{ end }}
+    </ul>
+  </body>
+</html>
