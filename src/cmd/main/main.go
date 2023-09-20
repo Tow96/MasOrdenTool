@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/tow96/masordentool/src/pkg/db"
 	"github.com/tow96/masordentool/src/pkg/logger"
 	"github.com/tow96/masordentool/src/pkg/scheduler"
 	"github.com/tow96/masordentool/src/pkg/server"
@@ -9,6 +10,7 @@ import (
 func main() {
 	logger.SetLogger()
 	scheduler.SetupScheduler()
+	db.ConnectToDb()
 
 	// Separate cron routine for the scheduler
 	go func() {
