@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/tow96/masordentool/src/pkg/env"
 )
 
 func StartServer() {
@@ -15,8 +16,7 @@ func StartServer() {
 	})
 	// -------------------------------------------------
 
-	// TODO: Set env
-	port := ":3000"
+	port := ":" + env.GetVariable("HTTP_PORT")
 	http.ListenAndServe(port, r)
 	slog.Info("Server listening on port" + port)
 }

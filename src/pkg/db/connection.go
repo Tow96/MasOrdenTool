@@ -4,12 +4,12 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/tow96/masordentool/src/pkg/env"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-// TODO: add env
-var dsn = "admin:pass@tcp(127.0.0.1:3306)/masorden?charset=utf8&parseTime=True&loc=Local"
+var dsn = env.GetVariable("MYSQL_CONN_STRING")
 var DB *gorm.DB
 
 func ConnectToDb() {
